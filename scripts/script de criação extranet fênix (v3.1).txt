@@ -1,0 +1,136 @@
+CREATE TABLE [dbo].[anexo] (
+    [Id]      INT   IDENTITY (1,1) NOT NULL,
+    [nome]    NVARCHAR (50)  NOT NULL,
+    [arquivo] VARBINARY (MAX) NOT NULL,
+    [tipoArquivo] NVARCHAR(MAX)NOT NULL,
+    PRIMARY KEY CLUSTERED ([Id] ASC)
+);
+
+CREATE TABLE [dbo].[areaPretendida] (
+    [id]    INT     IDENTITY   (1,1)   NOT NULL,
+    [cargo] NVARCHAR (50) NOT NULL,
+    PRIMARY KEY CLUSTERED ([id] ASC)
+);
+
+CREATE TABLE [dbo].[menu] (
+    [id]        INT      IDENTITY  (1,1)  NOT NULL,
+    [nome]    NVARCHAR (MAX) NOT NULL,
+    [URL]       NVARCHAR (MAX) NOT NULL,
+    [ordem]     SMALLINT      NULL,
+    [codigoPai] BIGINT        NULL,
+    PRIMARY KEY CLUSTERED ([id] ASC)
+);
+
+CREATE TABLE [dbo].[estadoCivil] (
+    [id]        INT        IDENTITY  (1,1)  NOT NULL,
+    [descricao] NVARCHAR (50) NOT NULL,
+    PRIMARY KEY CLUSTERED ([id] ASC)
+);
+
+CREATE TABLE [dbo].[curriculo] (
+    [id]                INT           IDENTITY (1, 1) NOT NULL,
+    [nome]              NVARCHAR (50) NOT NULL,
+    [cpf]               NVARCHAR (50) NOT NULL,
+    [dataNascimento]    DATE          NOT NULL,
+    [uf]                NCHAR (10)    NOT NULL,
+    [cep]               NVARCHAR (50) NOT NULL,
+    [cidade]            NVARCHAR (MAX) NOT NULL,
+    [bairro]            NVARCHAR (MAX) NOT NULL,
+    [rua]               NVARCHAR (MAX) NOT NULL,
+    [numero]            INT           NOT NULL,
+    [descricao]         NVARCHAR (50) NULL,
+    [telefoneFixo]      NVARCHAR (50) NULL,
+    [telefoneCelular]   NVARCHAR (50) NOT NULL,
+    [email]             NVARCHAR (50) NOT NULL,
+    [siteBlog]          NVARCHAR (50) NULL,
+    [skype]             NVARCHAR (50) NULL,
+    [remuneracao]       FLOAT (53)    NOT NULL,
+    [genero]            NVARCHAR(50)     NOT NULL,
+    [areaPretendida_fk] INT           NOT NULL,
+    [estadoCivil_fk]    INT           NOT NULL,
+    [anexo_fk]          INT           NULL,
+    [dataEnvio]         DATE      NOT NULL,
+    PRIMARY KEY CLUSTERED ([id] ASC),
+    
+    CONSTRAINT [FK_curriculo_areaPretendida] FOREIGN KEY ([areaPretendida_fk]) REFERENCES [dbo].[areaPretendida] ([id]),
+    CONSTRAINT [FK_curriculo_estadoCivil] FOREIGN KEY ([estadoCivil_fk]) REFERENCES [dbo].[estadoCivil] ([id])
+);
+
+
+
+CREATE TABLE [dbo].[usuario] (
+    [id]           INT     IDENTITY  (1,1)   NOT NULL,
+    [nome]         NVARCHAR (50) NOT NULL,
+    [cargo]        NVARCHAR (50) NOT NULL,
+    [usuarioLogin] NVARCHAR (50) NOT NULL,
+    [senha]        NVARCHAR (50) NOT NULL,
+    [centroCusto]  NVARCHAR (50) NOT NULL,
+    [email]        NVARCHAR (50) NOT NULL,
+    [bu]           NVARCHAR (50) NOT NULL,
+    [setor]        NVARCHAR (50) NOT NULL,
+    [situacao]     BIT           NOT NULL,
+    PRIMARY KEY CLUSTERED ([id] ASC),
+    UNIQUE NONCLUSTERED ([usuarioLogin] ASC),
+    UNIQUE NONCLUSTERED ([email] ASC)
+);
+
+
+CREATE TABLE [dbo].[grupoUsuario] (
+    [id]         INT         IDENTITY  (1,1)  NOT NULL,
+    [nome]       NVARCHAR (50) NOT NULL,
+    [descricao]  NVARCHAR (50) NULL,
+    [graficoUrl] NVARCHAR (50) NOT NULL,
+	[privilegio] NVARCHAR (MAX) NOT NULL,
+    PRIMARY KEY CLUSTERED ([id] ASC)
+);
+
+CREATE TABLE [dbo].[postagem] (
+    [id]              INT    IDENTITY   (1,1)    NOT NULL,
+    [usuario_fk]      INT            NOT NULL,
+    [corpo]           NVARCHAR (MAX) NOT NULL,
+    [dataHora]        DATETIME       NOT NULL,
+    [titulo]          NVARCHAR (MAX) NOT NULL,
+    [etiqueta]        NVARCHAR (50)  NULL,
+    [rascunho]	      INT NOT NULL,
+    PRIMARY KEY CLUSTERED ([id] ASC),
+    CONSTRAINT [FK_postagem_usuario] FOREIGN KEY ([usuario_fk]) REFERENCES [dbo].[usuario] ([id])
+);
+
+
+
+CREATE TABLE [dbo].[imagem] (
+    [id]          INT        IDENTITY  (1,1)   NOT NULL,
+    [nome]        NVARCHAR (50) NOT NULL,
+    [imagem]      IMAGE         NOT NULL,
+    [postagem_fk] INT           NOT NULL,
+    [tipoArquivo] NVARCHAR (MAX) NOT NULL,
+    PRIMARY KEY CLUSTERED ([id] ASC),
+    CONSTRAINT [FK_imagem_postagem] FOREIGN KEY ([postagem_fk]) REFERENCES [dbo].[postagem] ([id])
+  
+);
+
+
+CREATE TABLE [dbo].[usuarioXGrupo] (
+    [usuario_fk]      INT   NOT NULL,
+    [grupoUsuario_fk] INT   NOT NULL,
+    CONSTRAINT [FK_usuarioGrupo_grupoUsuario] FOREIGN KEY ([grupoUsuario_fk]) REFERENCES [dbo].[grupoUsuario] ([id]),
+    CONSTRAINT [FK_usuarioGrupo_usuario] FOREIGN KEY ([usuario_fk]) REFERENCES [dbo].[usuario] ([id])
+);
+
+
+CREATE TABLE [dbo].[grupoXMenu] (
+    [grupoUsuario_fk] INT  NOT NULL,
+    [Menu_fk] INT  NOT NULL,
+    CONSTRAINT [FK_grupoXMenu_grupoUsuario] FOREIGN KEY ([grupoUsuario_fk]) REFERENCES [dbo].[grupoUsuario] ([id]),
+    CONSTRAINT [FK_grupoXMenu_Menu] FOREIGN KEY ([Menu_fk]) REFERENCES [dbo].[Menu] ([id])
+);
+
+CREATE TABLE [dbo].[historico] (
+    [id]         INT     IDENTITY (1,1)  NOT NULL,
+    [dataHora]   DATETIME NOT NULL,
+    [usuario_fk] INT      NOT NULL,
+    PRIMARY KEY CLUSTERED ([id] ASC),
+    CONSTRAINT [FK_historico_usuario] FOREIGN KEY ([usuario_fk]) REFERENCES [dbo].[usuario] ([id])
+    
+);
+

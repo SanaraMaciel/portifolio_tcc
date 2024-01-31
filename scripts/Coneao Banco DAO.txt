@@ -1,0 +1,41 @@
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Negocio.DAO
+{
+    public class ConexaoBanco
+    {
+        public static SqlConnection Conectar()
+        {
+          string stringConexao = "Data Source [Local];" +
+                                    "Initial Catalog=nomeDoBancoDeDados;" +
+                                    "User=usuarioDoBanco;" +
+                                    "password = senaDOUsuario";
+
+            SqlConnection conexao = new SqlConnection(stringConexao);
+            conexao.Open();
+            return conexao;
+        }
+
+        public static void CRUD(SqlCommand comando)
+        {
+            SqlConnection con = Conectar();
+            comando.Connection = con;
+            comando.ExecuteNonQuery();
+            con.Close();
+        }
+
+        public static SqlDataReader Selecionar(SqlCommand comando) {
+
+            SqlConnection con = Conectar();
+            comando.Connection = con;
+            SqlDataReader dr = comando.ExecuteReader(CommandBehavior.CloseConnection);
+            return dr;
+        }
+    }
+}
